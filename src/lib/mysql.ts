@@ -9,7 +9,7 @@ export async function getDBConnection(): Promise<mysql.Connection | null> {
       user: config.get('mysql.user') as string,
       password: config.get('mysql.password') as string,
       database: config.get('mysql.database') as string,
-      timezone: '+09:00'
+      timezone: '+09:00',
     })
     await connection.beginTransaction()
 
