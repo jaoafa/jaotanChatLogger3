@@ -86,6 +86,7 @@ export async function checkNewVersion() {
   console.log("Latest: " + latestCommitSha)
   try{
     getClient().destroy()
+    process.exit(0)
   }catch (e){
     console.log(e)
   }
