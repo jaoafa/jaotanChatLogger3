@@ -15,6 +15,7 @@ import {
   editedMessage,
   newMessage,
 } from './lib/messageProcessing'
+import {checkNewVersion} from "./lib/utils";
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -42,6 +43,10 @@ client.on('ready', async () => {
       channel.join()
     })
   })
+
+  setInterval(async () => {
+    await checkNewVersion()
+  }, 1000 * 60 * 60)
 })
 
 // message: メッセージが送信・受信された時 -> DBに新規メッセージデータを追加
