@@ -51,6 +51,7 @@ client.on('messageCreate', async (message: Message) => {
     return
   }
   await newMessage(conn, message)
+  conn.destroy()
 })
 
 client.on(
@@ -67,6 +68,7 @@ client.on(
       conn,
       newMessage.partial ? await newMessage.fetch() : newMessage
     )
+    conn.destroy()
   }
 )
 
@@ -81,6 +83,7 @@ client.on('raw', async (raw) => {
     const channelId = raw.d.channel_id
     const messageId = raw.d.id
     await deletedMessage(conn, guildId, channelId, messageId)
+    conn.destroy()
   }
 
   if (raw.t === 'MESSAGE_UPDATE') {
@@ -99,6 +102,7 @@ client.on('raw', async (raw) => {
     }
 
     await editedMessage(conn, message)
+    conn.destroy()
   }
 })
 
@@ -121,7 +125,7 @@ client.on('threadUpdate', async (thread: ThreadChannel) => {
   if (thread.archived) {
     return
   }
-  await thread.join()
+  await thread.join().catch(() => null)
 })
 
 // threadListSync: スレッドリストが変更された場合に、そのスレッドに参加していなかった場合は参加する
@@ -132,7 +136,10 @@ client.on(
       if (!thread.joined) {
         return
       }
-      thread.join()
+      if (thread.archived) {
+        return
+      }
+      thread.join().catch(() => null)
     })
   }
 )
