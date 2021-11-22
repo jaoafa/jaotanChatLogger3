@@ -10,6 +10,8 @@ export async function getDBConnection(): Promise<mysql.Connection | null> {
       password: config.get('mysql.password') as string,
       database: config.get('mysql.database') as string,
       timezone: '+09:00',
+      supportBigNumbers: true,
+      bigNumberStrings: true,
     })
     await connection.beginTransaction()
 
