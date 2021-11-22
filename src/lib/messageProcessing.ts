@@ -133,8 +133,13 @@ export async function editedMessage(
 
   await check(conn, message)
 
-  if ((await getDBMessage(conn, message.id)) === null) {
+  const oldMessage = await getDBMessage(conn, message.id)
+  if (oldMessage === null) {
     await newMessage(conn, message, true)
+  }
+
+  if (message.editedAt === null) {
+    return
   }
 
   try {
