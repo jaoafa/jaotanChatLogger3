@@ -1,6 +1,6 @@
-import {Message} from 'discord.js'
+import {Message, NewsChannel, Snowflake, TextChannel, ThreadChannel} from 'discord.js'
 import mysql, {RowDataPacket} from 'mysql2/promise'
-import { execSync } from 'child_process'
+import {execSync} from 'child_process'
 import {getClient} from "../main";
 import axios from "axios";
 
@@ -16,7 +16,10 @@ export async function getDBMessage(conn: mysql.Connection, messageId: string) {
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBGuild(conn: mysql.Connection, guildId: string) {
+export async function getDBGuild(conn: mysql.Connection, guildId: Snowflake | undefined) {
+  if (guildId === undefined) {
+    return null
+  }
   const [rows] = (await conn.query(
       'SELECT * FROM `guilds` WHERE guild_id = ?',
       [guildId]
@@ -24,14 +27,20 @@ export async function getDBGuild(conn: mysql.Connection, guildId: string) {
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBUser(conn: mysql.Connection, userId: string) {
+export async function getDBUser(conn: mysql.Connection, userId: string | undefined) {
+  if (userId === undefined) {
+    return null
+  }
   const [rows] = (await conn.query('SELECT * FROM `users` WHERE user_id = ?', [
     userId,
   ])) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBChannel(conn: mysql.Connection, channelId: string) {
+export async function getDBChannel(conn: mysql.Connection, channelId: string | undefined) {
+  if (channelId === undefined) {
+    return null
+  }
   const [rows] = (await conn.query(
       'SELECT * FROM `channels` WHERE channel_id = ?',
       [channelId]
@@ -39,12 +48,54 @@ export async function getDBChannel(conn: mysql.Connection, channelId: string) {
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBThread(conn: mysql.Connection, threadId: string) {
+export async function getDBThread(conn: mysql.Connection, threadId: string | undefined) {
+  if (threadId === undefined) {
+    return null
+  }
   const [rows] = (await conn.query(
       'SELECT * FROM `threads` WHERE channel_id = ?',
       [threadId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
+}
+
+export async function isDisabled(conn: mysql.Connection, message: Message): Promise<boolean> {
+  if (
+      !(
+          message.channel instanceof TextChannel ||
+          message.channel instanceof NewsChannel ||
+          message.channel instanceof ThreadChannel
+      )
+  ) {
+    return false
+  }
+  const guild = await getDBGuild(conn, message.guild?.id)
+  if (guild !== null && guild.disabled) {
+    console.log("isDisabled: Guild:" + message.guild?.name + " is disabled")
+    return true
+  }
+  const channel = await getDBChannel(conn, message.channel.isThread()
+      ? message.channel.parent?.id
+      : message.channelId)
+  if (channel !== null && channel.disabled) {
+    console.log("-> isDisabled: Channel:" + (message.channel.isThread()
+        ? message.channel.parent?.name
+        : message.channel.name) + " is disabled")
+    return true
+  }
+  if (message.channel.isThread()) {
+    const thread = await getDBThread(conn, message.channelId)
+    if (thread !== null && thread.disabled) {
+      console.log("-> isDisabled: Thread:" + message.channel.name + " is disabled")
+      return true
+    }
+  }
+  const user = await getDBUser(conn, message.author.id)
+  if(user !== null && user.disabled){
+    console.log("-> isDisabled: User:" + message.author.tag + " is disabled")
+    return true
+  }
+  return false
 }
 
 export function formatDate(date: Date, format: string): string {
@@ -64,10 +115,10 @@ export async function getLatestCommitSha(): Promise<string> {
   return json.sha
 }
 
-export async function getNowCommitSha(){
+export async function getNowCommitSha() {
   try {
     return execSync('git rev-parse HEAD').toString().trim()
-  }catch (e) {
+  } catch (e) {
     return null
   }
 }
@@ -75,7 +126,7 @@ export async function getNowCommitSha(){
 export async function checkNewVersion() {
   const latestCommitSha = await getLatestCommitSha()
   const nowCommitSha = await getNowCommitSha()
-  if (latestCommitSha === null || nowCommitSha == null){
+  if (latestCommitSha === null || nowCommitSha == null) {
     return
   }
   if (latestCommitSha === nowCommitSha) {
@@ -84,10 +135,10 @@ export async function checkNewVersion() {
   console.log("New version found!")
   console.log("Now: " + nowCommitSha)
   console.log("Latest: " + latestCommitSha)
-  try{
+  try {
     getClient().destroy()
     process.exit(0)
-  }catch (e){
+  } catch (e) {
     console.log(e)
   }
 }

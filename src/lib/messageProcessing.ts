@@ -2,7 +2,16 @@ import mysql from 'mysql2/promise'
 import {Message, NewsChannel, Snowflake, TextChannel, ThreadChannel,} from 'discord.js'
 import os from 'os'
 import {check} from './checkData'
-import {formatDate, getDBChannel, getDBGuild, getDBMessage, getDBThread, getDBUser, getDisplayContent,} from './utils'
+import {
+  formatDate,
+  getDBChannel,
+  getDBGuild,
+  getDBMessage,
+  getDBThread,
+  getDBUser,
+  getDisplayContent,
+  isDisabled,
+} from './utils'
 import Downloader from 'nodejs-file-downloader'
 import config from 'config'
 import {getClient} from '../main'
@@ -40,6 +49,9 @@ export async function newMessage(
   )
 
   await check(conn, message)
+  if(await isDisabled(conn, message)){
+    return
+  }
 
   try {
     await conn.execute(
