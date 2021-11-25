@@ -1,5 +1,11 @@
 import mysql from 'mysql2/promise'
-import {Message, NewsChannel, Snowflake, TextChannel, ThreadChannel,} from 'discord.js'
+import {
+  Message,
+  NewsChannel,
+  Snowflake,
+  TextChannel,
+  ThreadChannel,
+} from 'discord.js'
 import os from 'os'
 import {check} from './checkData'
 import {
@@ -225,9 +231,16 @@ export async function deletedMessage(
   }
   const deletedMessageChannelId = config.get<string>('deletedMessageChannel')
   getClient()
-      .channels.fetch(deletedMessageChannelId)
+      .channels
+      .fetch(deletedMessageChannelId)
       .then(async (c) => {
-        if (!(c instanceof TextChannel)) {
+        if (
+            !(
+                c instanceof TextChannel ||
+                c instanceof NewsChannel ||
+                c instanceof ThreadChannel
+            )
+        ) {
           return
         }
         const attachments =
