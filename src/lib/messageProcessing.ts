@@ -1,11 +1,5 @@
 import mysql from 'mysql2/promise'
-import {
-  Message,
-  NewsChannel,
-  Snowflake,
-  TextChannel,
-  ThreadChannel,
-} from 'discord.js'
+import {Message, NewsChannel, Snowflake, TextChannel, ThreadChannel,} from 'discord.js'
 import os from 'os'
 import {check} from './checkData'
 import {
@@ -55,7 +49,7 @@ export async function newMessage(
   )
 
   await check(conn, message)
-  if(await isDisabled(conn, message)){
+  if (await isDisabled(conn, message)) {
     return
   }
 
@@ -227,6 +221,10 @@ export async function deletedMessage(
 
   // jMS Gamers Clubの場合のみ #deleted-messages に投げる
   if (guildId !== '597378876556967936') {
+    return
+  }
+  // botの場合は通知しない
+  if (user.bot) {
     return
   }
   const deletedMessageChannelId = config.get<string>('deletedMessageChannel')
