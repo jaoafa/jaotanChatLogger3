@@ -53,7 +53,7 @@ export async function getDBThread(conn: mysql.Connection, threadId: string | und
     return null
   }
   const [rows] = (await conn.query(
-      'SELECT * FROM `threads` WHERE channel_id = ?',
+      'SELECT * FROM `threads` WHERE thread_id = ?',
       [threadId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
