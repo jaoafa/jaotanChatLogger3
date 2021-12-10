@@ -15,7 +15,7 @@ import {
   editedMessage,
   newMessage,
 } from './lib/messageProcessing'
-import {checkNewVersion} from "./lib/utils";
+import { checkNewVersion } from './lib/utils'
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],

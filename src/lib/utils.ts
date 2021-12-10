@@ -1,8 +1,14 @@
-import {Message, NewsChannel, Snowflake, TextChannel, ThreadChannel} from 'discord.js'
-import mysql, {RowDataPacket} from 'mysql2/promise'
-import {execSync} from 'child_process'
-import {getClient} from "../main";
-import axios from "axios";
+import {
+  Message,
+  NewsChannel,
+  Snowflake,
+  TextChannel,
+  ThreadChannel,
+} from 'discord.js'
+import mysql, { RowDataPacket } from 'mysql2/promise'
+import { execSync } from 'child_process'
+import { getClient } from '../main'
+import axios from 'axios'
 
 export function getDisplayContent(message: Message) {
   return message.cleanContent.replaceAll(/<:(.+?):([0-9]+?)>/g, ':$1:')
@@ -10,24 +16,30 @@ export function getDisplayContent(message: Message) {
 
 export async function getDBMessage(conn: mysql.Connection, messageId: string) {
   const [rows] = (await conn.query(
-      'SELECT * FROM `message-createds` WHERE msgid = ?',
-      [messageId]
+    'SELECT * FROM `message-createds` WHERE msgid = ?',
+    [messageId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBGuild(conn: mysql.Connection, guildId: Snowflake | undefined) {
+export async function getDBGuild(
+  conn: mysql.Connection,
+  guildId: Snowflake | undefined
+) {
   if (guildId === undefined) {
     return null
   }
   const [rows] = (await conn.query(
-      'SELECT * FROM `guilds` WHERE guild_id = ?',
-      [guildId]
+    'SELECT * FROM `guilds` WHERE guild_id = ?',
+    [guildId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBUser(conn: mysql.Connection, userId: string | undefined) {
+export async function getDBUser(
+  conn: mysql.Connection,
+  userId: string | undefined
+) {
   if (userId === undefined) {
     return null
   }
@@ -37,62 +49,78 @@ export async function getDBUser(conn: mysql.Connection, userId: string | undefin
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBChannel(conn: mysql.Connection, channelId: string | undefined) {
+export async function getDBChannel(
+  conn: mysql.Connection,
+  channelId: string | undefined
+) {
   if (channelId === undefined) {
     return null
   }
   const [rows] = (await conn.query(
-      'SELECT * FROM `channels` WHERE channel_id = ?',
-      [channelId]
+    'SELECT * FROM `channels` WHERE channel_id = ?',
+    [channelId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function getDBThread(conn: mysql.Connection, threadId: string | undefined) {
+export async function getDBThread(
+  conn: mysql.Connection,
+  threadId: string | undefined
+) {
   if (threadId === undefined) {
     return null
   }
   const [rows] = (await conn.query(
-      'SELECT * FROM `threads` WHERE thread_id = ?',
-      [threadId]
+    'SELECT * FROM `threads` WHERE thread_id = ?',
+    [threadId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
 
-export async function isDisabled(conn: mysql.Connection, message: Message): Promise<boolean> {
+export async function isDisabled(
+  conn: mysql.Connection,
+  message: Message
+): Promise<boolean> {
   if (
-      !(
-          message.channel instanceof TextChannel ||
-          message.channel instanceof NewsChannel ||
-          message.channel instanceof ThreadChannel
-      )
+    !(
+      message.channel instanceof TextChannel ||
+      message.channel instanceof NewsChannel ||
+      message.channel instanceof ThreadChannel
+    )
   ) {
     return false
   }
   const guild = await getDBGuild(conn, message.guild?.id)
   if (guild !== null && guild.disabled) {
-    console.log("isDisabled: Guild:" + message.guild?.name + " is disabled")
+    console.log('isDisabled: Guild:' + message.guild?.name + ' is disabled')
     return true
   }
-  const channel = await getDBChannel(conn, message.channel.isThread()
-      ? message.channel.parent?.id
-      : message.channelId)
+  const channel = await getDBChannel(
+    conn,
+    message.channel.isThread() ? message.channel.parent?.id : message.channelId
+  )
   if (channel !== null && channel.disabled) {
-    console.log("-> isDisabled: Channel:" + (message.channel.isThread()
-        ? message.channel.parent?.name
-        : message.channel.name) + " is disabled")
+    console.log(
+      '-> isDisabled: Channel:' +
+        (message.channel.isThread()
+          ? message.channel.parent?.name
+          : message.channel.name) +
+        ' is disabled'
+    )
     return true
   }
   if (message.channel.isThread()) {
     const thread = await getDBThread(conn, message.channelId)
     if (thread !== null && thread.disabled) {
-      console.log("-> isDisabled: Thread:" + message.channel.name + " is disabled")
+      console.log(
+        '-> isDisabled: Thread:' + message.channel.name + ' is disabled'
+      )
       return true
     }
   }
   const user = await getDBUser(conn, message.author.id)
-  if(user !== null && user.disabled){
-    console.log("-> isDisabled: User:" + message.author.tag + " is disabled")
+  if (user !== null && user.disabled) {
+    console.log('-> isDisabled: User:' + message.author.tag + ' is disabled')
     return true
   }
   return false
@@ -110,7 +138,9 @@ export function formatDate(date: Date, format: string): string {
 }
 
 export async function getLatestCommitSha(): Promise<string> {
-  const response = await axios.get('https://api.github.com/repos/jaoafa/jaotanChatLogger3/commits/master')
+  const response = await axios.get(
+    'https://api.github.com/repos/jaoafa/jaotanChatLogger3/commits/master'
+  )
   const json = await response.data
   return json.sha
 }
@@ -132,9 +162,9 @@ export async function checkNewVersion() {
   if (latestCommitSha === nowCommitSha) {
     return
   }
-  console.log("New version found!")
-  console.log("Now: " + nowCommitSha)
-  console.log("Latest: " + latestCommitSha)
+  console.log('New version found!')
+  console.log('Now: ' + nowCommitSha)
+  console.log('Latest: ' + latestCommitSha)
   try {
     getClient().destroy()
     process.exit(0)
