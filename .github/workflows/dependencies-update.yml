@@ -47,10 +47,8 @@ jobs:
       - name: Run linter 👀
         run: yarn lint
 
-      - name: Run build & generate 🏗️
-        run: |
-          yarn build
-          yarn generate
+      - name: Run compile 🏗️
+        run: yarn compile
 
       - name: Set git config
         run: |
