@@ -113,7 +113,7 @@ client.on('raw', async (raw) => {
 
 // threadCreate: スレッドが作成された場合にそのスレッドに参加する
 client.on('threadCreate', async (thread: ThreadChannel) => {
-  if (!thread.joined) {
+  if (thread.joined) {
     return
   }
   if (thread.archived) {
@@ -124,7 +124,7 @@ client.on('threadCreate', async (thread: ThreadChannel) => {
 
 // threadUpdate: スレッドが更新された場合に、そのスレッドに参加していなかった場合は参加する
 client.on('threadUpdate', async (thread: ThreadChannel) => {
-  if (!thread.joined) {
+  if (thread.joined) {
     return
   }
   if (thread.archived) {
