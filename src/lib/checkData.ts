@@ -1,4 +1,3 @@
-import mysql, { ResultSetHeader } from 'mysql2/promise'
 import {
   Guild,
   GuildAuditLogs,
@@ -8,6 +7,7 @@ import {
   ThreadChannel,
   User,
 } from 'discord.js'
+import mysql, { ResultSetHeader } from 'mysql2/promise'
 import { getDBChannel, getDBGuild, getDBThread, getDBUser } from './utils'
 
 export async function check(conn: mysql.Connection, message: Message) {
@@ -392,7 +392,13 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
   await conn.commit()
 }
 
-async function getNameChanged(conn: mysql.Connection, log: GuildAuditLogs) {
+async function getNameChanged(
+  conn: mysql.Connection,
+  log:
+    | GuildAuditLogs<'GUILD_UPDATE'>
+    | GuildAuditLogs<'CHANNEL_UPDATE'>
+    | GuildAuditLogs<'THREAD_UPDATE'>
+) {
   let changedBy = null
   let timestamp = null
   for (const entry of log.entries.values()) {
