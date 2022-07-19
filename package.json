@@ -44,6 +44,6 @@
   },
   "dependencies": {
     "mysql2": "2.3.3",
-    "nodejs-file-downloader": "4.9.3"
+    "nodejs-file-downloader": "4.10.1"
   }
 }
