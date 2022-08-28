@@ -985,15 +985,15 @@ flatted@^3.1.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.4.tgz#28d9969ea90661b5134259f312ab6aa7929ac5e2"
   integrity sha512-8/sOawo8tJ4QOBX8YlQBMxL8+RLZfxMQOif9o0KUKTNTjMYElWPE0r/m5VNFxTRd0NSw8qSy8dajrwX4RYI1Hw==
 
-follow-redirects@^1.13.0:
-  version "1.14.8"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.8.tgz#016996fb9a11a100566398b1c6839337d7bfa8fc"
-  integrity sha512-1x0S9UVJHsQprFcEC/qnNzBLcIxsjAV905f/UkQxbclCsoTWlacCNOpQa/anodLl2uaEKFhfWOvM2Qg77+15zA==
-
 follow-redirects@^1.14.9:
   version "1.14.9"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz#dd4ea157de7bfaf9ea9b3fbd85aa16951f78d8d7"
   integrity sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==
+
+follow-redirects@^1.15.1:
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.1.tgz#0ca6a452306c9b276e4d3127483e29575e207ad5"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 form-data@^3.0.0:
   version "3.0.1"
@@ -1556,12 +1556,12 @@ node-fetch@^2.6.7:
   dependencies:
     whatwg-url "^5.0.0"
 
-nodejs-file-downloader@4.10.1:
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/nodejs-file-downloader/-/nodejs-file-downloader-4.10.1.tgz#6bc8913c060a31dceacaa396f8a0510b65531556"
-  integrity sha512-epzW3GsRjU6xDAfE4wgp2HHXuKDZhtpEDBeIuz92Ovs01ImrikB++rmjXSqeOU0Acrd+2Nbdqc1qDZRXG2Qv3g==
+nodejs-file-downloader@4.10.2:
+  version "4.10.2"
+  resolved "https://registry.yarnpkg.com/nodejs-file-downloader/-/nodejs-file-downloader-4.10.2.tgz#68a5b9b5b8b42719c6ed86500e7df30f30f308dc"
+  integrity sha512-pTVlytER/4wxcIpEhLXoqhuJ7WH1+xSFNLbI0wPmbwH3pWlJRRebb1Kbu91mz1CyOJmO4sj6YLH1wkF1B6efrQ==
   dependencies:
-    follow-redirects "^1.13.0"
+    follow-redirects "^1.15.1"
     https-proxy-agent "^5.0.0"
     mime-types "^2.1.27"
     sanitize-filename "^1.6.3"
