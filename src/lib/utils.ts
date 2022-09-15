@@ -1,14 +1,7 @@
-import {
-  GuildTextBasedChannel,
-  Message,
-  NewsChannel,
-  Snowflake,
-  TextChannel,
-  ThreadChannel,
-} from 'discord.js'
-import mysql, { RowDataPacket } from 'mysql2/promise'
-import { execSync } from 'child_process'
-import { getClient } from '../main'
+import {GuildTextBasedChannel, Message, NewsChannel, Snowflake, TextChannel, ThreadChannel,} from 'discord.js'
+import mysql, {RowDataPacket} from 'mysql2/promise'
+import {execSync} from 'child_process'
+import {getClient} from '../main'
 import axios from 'axios'
 
 export function getDisplayContent(message: Message) {
@@ -17,8 +10,8 @@ export function getDisplayContent(message: Message) {
 
 export async function getDBMessage(conn: mysql.Connection, messageId: string) {
   const [rows] = (await conn.query(
-    'SELECT * FROM `message-createds` WHERE msgid = ?',
-    [messageId]
+      'SELECT * FROM `message-createds` WHERE msgid = ?',
+      [messageId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
 }
@@ -127,12 +120,15 @@ export async function isDisabled(
   return false
 }
 
-export async function getDBMessageIds(conn: mysql.Connection, channel: GuildTextBasedChannel): Promise<string[]> {
+export async function getDBMessageIds(
+    conn: mysql.Connection,
+    channel: GuildTextBasedChannel
+): Promise<string[]> {
   const [rows] = (await conn.query(
       'SELECT msgid FROM `message-createds` WHERE guild_id = ? AND channel_id = ?',
       [channel.guild.id, channel.id]
   )) as RowDataPacket[][]
-  return rows.map(row => row.msgid)
+  return rows.map((row) => row.msgid)
 }
 
 export function formatDate(date: Date, format: string): string {

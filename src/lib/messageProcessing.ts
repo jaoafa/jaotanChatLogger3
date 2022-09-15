@@ -1,11 +1,12 @@
 import mysql from 'mysql2/promise'
 import {
+    ChannelType,
+    FetchMessagesOptions,
     Message,
     NewsChannel,
     Snowflake,
     TextChannel,
     ThreadChannel,
-    ChannelType, FetchMessagesOptions
 } from 'discord.js'
 import os from 'os'
 import {check} from './checkData'
@@ -13,7 +14,8 @@ import {
     formatDate,
     getDBChannel,
     getDBGuild,
-    getDBMessage, getDBMessageIds,
+    getDBMessage,
+    getDBMessageIds,
     getDBThread,
     getDBUser,
     getDisplayContent,
@@ -22,11 +24,14 @@ import {
 import Downloader from 'nodejs-file-downloader'
 import config from 'config'
 import {getClient} from '../main'
-import {getDBConnection} from "./mysql";
+import {getDBConnection} from './mysql'
 
 export async function addOldMessages() {
     console.log('Starting to add old messages')
     const client = getClient()
+    if (client === null || client.user === null) {
+        return
+    }
     const conn = await getDBConnection()
     if (conn === null) {
         return
@@ -36,44 +41,47 @@ export async function addOldMessages() {
     for (const guild of client.guilds.cache.values()) {
         for (const channel of guild.channels.cache.values()) {
             if (channel.type !== ChannelType.GuildText) continue
-            if (!channel.permissionsFor(client.user!)?.has('ViewChannel')) continue
+            if (!channel.permissionsFor(client.user)?.has('ViewChannel')) continue
             channels.push(channel)
         }
     }
 
-    await Promise.all(channels.map(async (channel) => {
-        console.log(`Adding old messages from ${channel.name}`)
-        const messageIds = await getDBMessageIds(conn, channel)
+    await Promise.all(
+        channels.map(async (channel) => {
+            console.log(`Adding old messages from ${channel.name}`)
+            const messageIds = await getDBMessageIds(conn, channel)
 
-        let beforeId = undefined
-        let newMessageCount = 0
-        try {
-            while (true) {
-                const params: FetchMessagesOptions = {
-                    limit: 100,
-                }
-                if (beforeId !== undefined) {
-                    params['before'] = beforeId
-                }
-                const messages = await channel.messages.fetch(params)
-                if (messages.size === 0) break
+            let beforeId = null
+            let newMessageCount = 0
+            try {
+                while (true) {
+                    const params: FetchMessagesOptions = {
+                        limit: 100,
+                    }
+                    if (beforeId !== null) {
+                        params.before = beforeId
+                    }
+                    const messages = await channel.messages.fetch(params)
+                    if (messages.size === 0) break
 
-                for (const message of messages.values()) {
-                    if (messageIds.includes(message.id)) continue
-                    await newMessage(conn, message, true)
-                    newMessageCount++
-                }
+                    for (const message of messages.values()) {
+                        if (messageIds.includes(message.id)) continue
+                        await newMessage(conn, message, true)
+                        newMessageCount++
+                    }
 
-                beforeId = messages.last()?.id
-                const _sleep = (ms: number | undefined) => new Promise((resolve) => setTimeout(resolve, ms));
-                await _sleep(2000);
+                    beforeId = messages.last()?.id
+                    const _sleep = (ms: number | undefined) =>
+                        new Promise((resolve) => setTimeout(resolve, ms))
+                    await _sleep(2000)
+                }
+            } catch (e) {
+                console.error(e)
             }
-        } catch (e) {
-            console.error(e)
-        }
 
-        console.log(`Added ${newMessageCount} new messages from ${channel.name}!`)
-    }))
+            console.log(`Added ${newMessageCount} new messages from ${channel.name}!`)
+        })
+    )
     console.log('Finished adding old messages')
 }
 
