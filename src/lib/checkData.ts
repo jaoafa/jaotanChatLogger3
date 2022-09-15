@@ -6,6 +6,7 @@ import {
   TextChannel,
   ThreadChannel,
   User,
+  AuditLogEvent,
 } from 'discord.js'
 import mysql, { ResultSetHeader } from 'mysql2/promise'
 import { getDBChannel, getDBGuild, getDBThread, getDBUser } from './utils'
@@ -97,7 +98,7 @@ async function checkRenamedGuild(conn: mysql.Connection, guild: Guild | null) {
   let changeLog = null
   try {
     const log = await guild.fetchAuditLogs({
-      type: 'GUILD_UPDATE',
+      type: AuditLogEvent.GuildUpdate,
       limit: 5,
     })
     changeLog = await getNameChanged(conn, log)
@@ -184,7 +185,7 @@ async function checkRenamedChannel(
   let changeLog = null
   try {
     const log = await channel.guild.fetchAuditLogs({
-      type: 'CHANNEL_UPDATE',
+      type: AuditLogEvent.ChannelUpdate,
       limit: 5,
     })
     changeLog = await getNameChanged(conn, log)
@@ -271,7 +272,7 @@ async function checkRenamedThread(
   let changeLog = null
   try {
     const log = await thread.guild.fetchAuditLogs({
-      type: 'THREAD_UPDATE',
+      type: AuditLogEvent.ThreadUpdate,
       limit: 5,
     })
     changeLog = await getNameChanged(conn, log)
@@ -395,9 +396,9 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
 async function getNameChanged(
   conn: mysql.Connection,
   log:
-    | GuildAuditLogs<'GUILD_UPDATE'>
-    | GuildAuditLogs<'CHANNEL_UPDATE'>
-    | GuildAuditLogs<'THREAD_UPDATE'>
+    | GuildAuditLogs<AuditLogEvent.GuildUpdate>
+    | GuildAuditLogs<AuditLogEvent.ChannelUpdate>
+    | GuildAuditLogs<AuditLogEvent.ThreadUpdate>
 ) {
   let changedBy = null
   let timestamp = null

@@ -2,7 +2,6 @@ import config from 'config'
 import {
   Client,
   Collection,
-  Intents,
   Message,
   PartialMessage,
   Snowflake,
@@ -11,6 +10,7 @@ import {
 } from 'discord.js'
 import { getDBConnection } from './lib/mysql'
 import {
+  addOldMessages,
   deletedMessage,
   editedMessage,
   newMessage,
@@ -18,7 +18,7 @@ import {
 import { checkNewVersion } from './lib/utils'
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+  intents: ['Guilds', 'GuildMessages'],
 })
 
 export function getClient() {
@@ -46,7 +46,11 @@ client.on('ready', async () => {
 
   setInterval(async () => {
     await checkNewVersion()
-  }, 1000 * 60 * 60)
+  }, 1000 * 60 * 60) // 1時間ごと
+  setInterval(async () => {
+    await addOldMessages()
+  }, 1000 * 60 * 60 * 24) // 1日ごと
+  await addOldMessages()
 })
 
 // message: メッセージが送信・受信された時 -> DBに新規メッセージデータを追加

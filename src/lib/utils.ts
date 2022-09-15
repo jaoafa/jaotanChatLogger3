@@ -1,4 +1,5 @@
 import {
+  GuildTextBasedChannel,
   Message,
   NewsChannel,
   Snowflake,
@@ -124,6 +125,14 @@ export async function isDisabled(
     return true
   }
   return false
+}
+
+export async function getDBMessageIds(conn: mysql.Connection, channel: GuildTextBasedChannel): Promise<string[]> {
+  const [rows] = (await conn.query(
+      'SELECT msgid FROM `message-createds` WHERE guild_id = ? AND channel_id = ?',
+      [channel.guild.id, channel.id]
+  )) as RowDataPacket[][]
+  return rows.map(row => row.msgid)
 }
 
 export function formatDate(date: Date, format: string): string {
