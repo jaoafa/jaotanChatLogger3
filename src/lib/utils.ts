@@ -10,6 +10,7 @@ import mysql, { RowDataPacket } from 'mysql2/promise'
 import { execSync } from 'child_process'
 import { getClient } from '../main'
 import axios from 'axios'
+import { createHash } from 'crypto'
 
 export function getDisplayContent(message: Message) {
   return message.cleanContent.replaceAll(/<:(.+?):([0-9]+?)>/g, ':$1:')
@@ -18,6 +19,17 @@ export function getDisplayContent(message: Message) {
 export async function getDBMessage(conn: mysql.Connection, messageId: string) {
   const [rows] = (await conn.query(
     'SELECT * FROM `message-createds` WHERE msgid = ?',
+    [messageId]
+  )) as RowDataPacket[][]
+  return rows.length !== 0 ? rows[0] : null
+}
+
+export async function getLastEditedDBMessage(
+  conn: mysql.Connection,
+  messageId: string
+) {
+  const [rows] = (await conn.query(
+    'SELECT * FROM `message-editeds` WHERE msgid = ? ORDER BY `timestamp` DESC LIMIT 1',
     [messageId]
   )) as RowDataPacket[][]
   return rows.length !== 0 ? rows[0] : null
@@ -163,6 +175,10 @@ export async function getNowCommitSha() {
   } catch (e) {
     return null
   }
+}
+
+export function md5hex(str: string): string {
+  return createHash('md5').update(str).digest('hex')
 }
 
 export async function checkNewVersion() {
