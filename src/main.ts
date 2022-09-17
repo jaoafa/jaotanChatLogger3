@@ -18,7 +18,7 @@ import {
 import { checkNewVersion } from './lib/utils'
 
 const client = new Client({
-  intents: ['Guilds', 'GuildMessages'],
+  intents: ['Guilds', 'GuildMessages', 'MessageContent'],
 })
 
 export function getClient() {
