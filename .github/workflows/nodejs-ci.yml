@@ -1,4 +1,4 @@
-# Node.js v14 と v16 でビルド・テストを実行する
+# Node.js v16 でビルド・テストを実行する
 
 name: Node CI
 
@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [14, 16]
+        node: [16]
 
     steps:
       - name: 🛎 Checkout
