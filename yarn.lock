@@ -1598,10 +1598,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-nodejs-file-downloader@4.10.5:
-  version "4.10.5"
-  resolved "https://registry.yarnpkg.com/nodejs-file-downloader/-/nodejs-file-downloader-4.10.5.tgz#3bc7dea6e1bb24fdc8e903cf736c0d2f24d85577"
-  integrity sha512-jVv30NO0mqzdb3I0twnuzqpe5LfeTHey2gFCcZhzqrOzzdjX1xuv7EJdNIsoENHYmwgO5349beL7O3Nrlr975A==
+nodejs-file-downloader@4.10.6:
+  version "4.10.6"
+  resolved "https://registry.yarnpkg.com/nodejs-file-downloader/-/nodejs-file-downloader-4.10.6.tgz#a2b6e2c721de14968cf6f8d7d980aac448217ea3"
+  integrity sha512-n9XK3+h1aSKbnf1dYvEiB6wd4rnzPz40IKBNuqr4zKlzfvc9AT69Vjf/X8+QwyOxsqYLY3/4etDZX97FKh27Jw==
   dependencies:
     follow-redirects "^1.15.1"
     https-proxy-agent "^5.0.0"
