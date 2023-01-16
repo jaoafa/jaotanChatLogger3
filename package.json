@@ -1,5 +1,5 @@
 {
-  "name": "discord-crosspost-auto-translate",
+  "name": "jaotan-chat-logger3",
   "version": "3.0.0",
   "description": "Collect chats and store them in a database.",
   "main": "dist/main.js",
