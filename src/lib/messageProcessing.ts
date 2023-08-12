@@ -80,7 +80,7 @@ export async function addOldMessages() {
       }
 
       console.log(`Added ${newMessageCount} new messages from ${channel.name}!`)
-    })
+    }),
   )
   console.log('Finished adding old messages')
 }
@@ -97,7 +97,7 @@ export async function addOldMessages() {
 export async function newMessage(
   conn: mysql.Connection,
   message: Message,
-  past = false
+  past = false,
 ): Promise<void> {
   if (
     !(
@@ -111,10 +111,10 @@ export async function newMessage(
   console.log(
     `New message${past ? '(past)' : ''}: ${message.cleanContent.substring(
       0,
-      10
+      10,
     )} by ${message.author.tag} (${message.id}) in ${message.channel.name} (${
       message.channelId
-    })`
+    })`,
   )
 
   await check(conn, message)
@@ -141,7 +141,7 @@ export async function newMessage(
           : null,
         os.hostname(),
         message.createdAt,
-      ]
+      ],
     )
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -181,7 +181,7 @@ export async function newMessage(
  */
 export async function editedMessage(
   conn: mysql.Connection,
-  message: Message
+  message: Message,
 ): Promise<void> {
   if (
     !(
@@ -195,7 +195,7 @@ export async function editedMessage(
   console.log(
     `Edited message: ${message.cleanContent.substring(0, 10)} by ${
       message.author.tag
-    } (${message.id}) in ${message.channel.name} (${message.channelId})`
+    } (${message.id}) in ${message.channel.name} (${message.channelId})`,
   )
 
   await check(conn, message)
@@ -219,7 +219,7 @@ export async function editedMessage(
         message.attachments.map((a) => a.url).join(','),
         os.hostname(),
         message.editedAt,
-      ]
+      ],
     )
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -245,16 +245,16 @@ export async function deletedMessage(
   conn: mysql.Connection,
   guildId: Snowflake,
   channelId: Snowflake,
-  messageId: Snowflake
+  messageId: Snowflake,
 ) {
   console.log(
-    `Deleted message: Guild#${guildId} Channel#${channelId} Message#${messageId}`
+    `Deleted message: Guild#${guildId} Channel#${channelId} Message#${messageId}`,
   )
 
   try {
     await conn.execute(
       'INSERT INTO `message-deleteds` (msgid, machine, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)',
-      [messageId, os.hostname()]
+      [messageId, os.hostname()],
     )
   } catch (e) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -321,7 +321,7 @@ export async function deletedMessage(
       const datetime = formatDate(message.timestamp, 'yyyy/MM/dd HH:mm:ss')
       const content = `\`\`\`${message.rawtext.replaceAll(
         '`',
-        '\\`'
+        '\\`',
       )}\`\`\`${attachments}\n-- at ${datetime} by ${userTag} - ${threadOrChannel}`
       await c.send(content)
     })

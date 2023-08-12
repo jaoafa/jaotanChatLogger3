@@ -7,6 +7,7 @@ import {
   ThreadChannel,
   User,
   AuditLogEvent,
+  ForumChannel,
 } from 'discord.js'
 import mysql, { ResultSetHeader } from 'mysql2/promise'
 import { getDBChannel, getDBGuild, getDBThread, getDBUser } from './utils'
@@ -25,11 +26,11 @@ export async function check(conn: mysql.Connection, message: Message) {
   await checkRenamedGuild(conn, message.guild)
   await checkExistsChannel(
     conn,
-    message.channel.isThread() ? message.channel.parent : message.channel
+    message.channel.isThread() ? message.channel.parent : message.channel,
   )
   await checkRenamedChannel(
     conn,
-    message.channel.isThread() ? message.channel.parent : message.channel
+    message.channel.isThread() ? message.channel.parent : message.channel,
   )
   if (message.channel.isThread()) {
     await checkExistsThread(conn, message.channel)
@@ -56,7 +57,7 @@ async function checkExistsGuild(conn: mysql.Connection, guild: Guild | null) {
   await conn
     .execute(
       'INSERT INTO guilds (guild_id, name, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)',
-      [guild.id, guild.name]
+      [guild.id, guild.name],
     )
     .catch(() => null)
   await conn.commit()
@@ -80,12 +81,12 @@ async function checkRenamedGuild(conn: mysql.Connection, guild: Guild | null) {
     return
   }
   console.log(
-    `Renamed guild - Update row: ${dbGuild.name} -> ${guild.name} (${guild.id})`
+    `Renamed guild - Update row: ${dbGuild.name} -> ${guild.name} (${guild.id})`,
   )
   try {
     const result = (await conn.execute(
       'UPDATE guilds SET name = ? WHERE guild_id = ? AND name != ?',
-      [guild.name, guild.id, guild.name]
+      [guild.name, guild.id, guild.name],
     )) as unknown as ResultSetHeader[]
     if (result[0].affectedRows === 0) {
       console.log('-> The Guild name change has already been recorded.')
@@ -113,7 +114,7 @@ async function checkRenamedGuild(conn: mysql.Connection, guild: Guild | null) {
         changeLog ? changeLog.changedBy : null,
         'GUILD_NAME',
         changeLog ? changeLog.timestamp : null,
-      ]
+      ],
     )
     .catch(() => null)
   await conn.commit()
@@ -127,7 +128,7 @@ async function checkRenamedGuild(conn: mysql.Connection, guild: Guild | null) {
  */
 async function checkExistsChannel(
   conn: mysql.Connection,
-  channel: TextChannel | NewsChannel | null
+  channel: TextChannel | NewsChannel | ForumChannel | null,
 ) {
   if (channel === null) {
     throw new Error('channel is null.')
@@ -140,7 +141,7 @@ async function checkExistsChannel(
   await conn
     .execute(
       'INSERT INTO channels (channel_id, guild_id, name, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)',
-      [channel.id, channel.guild.id, channel.name]
+      [channel.id, channel.guild.id, channel.name],
     )
     .catch(() => null)
   await conn.commit()
@@ -154,7 +155,7 @@ async function checkExistsChannel(
  */
 async function checkRenamedChannel(
   conn: mysql.Connection,
-  channel: TextChannel | NewsChannel | null
+  channel: TextChannel | NewsChannel | ForumChannel | null,
 ) {
   if (channel === null) {
     throw new Error('channel is null.')
@@ -167,12 +168,12 @@ async function checkRenamedChannel(
     return
   }
   console.log(
-    `Renamed channel - Update row: ${dbChannel.name} -> ${channel.name} (${channel.id})`
+    `Renamed channel - Update row: ${dbChannel.name} -> ${channel.name} (${channel.id})`,
   )
   try {
     const result = (await conn.execute(
       'UPDATE channels SET name = ? WHERE channel_id = ? AND name != ?',
-      [channel.name, channel.id, channel.name]
+      [channel.name, channel.id, channel.name],
     )) as unknown as ResultSetHeader[]
     if (result[0].affectedRows === 0) {
       console.log('-> The channel name change has already been recorded.')
@@ -200,7 +201,7 @@ async function checkRenamedChannel(
         changeLog ? changeLog.changedBy : null,
         'CHANNEL_NAME',
         changeLog ? changeLog.timestamp : null,
-      ]
+      ],
     )
     .catch(() => null)
   await conn.commit()
@@ -214,7 +215,7 @@ async function checkRenamedChannel(
  */
 async function checkExistsThread(
   conn: mysql.Connection,
-  thread: ThreadChannel | null
+  thread: ThreadChannel | null,
 ) {
   if (thread === null) {
     throw new Error('thread is null.')
@@ -227,7 +228,7 @@ async function checkExistsThread(
   await conn
     .execute(
       'INSERT INTO threads (thread_id, guild_id, channel_id, name, created_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)',
-      [thread.id, thread.guild.id, thread.parent?.id, thread.name]
+      [thread.id, thread.guild.id, thread.parent?.id, thread.name],
     )
     .catch(() => null)
   await conn.commit()
@@ -241,7 +242,7 @@ async function checkExistsThread(
  */
 async function checkRenamedThread(
   conn: mysql.Connection,
-  thread: ThreadChannel | null
+  thread: ThreadChannel | null,
 ) {
   if (thread === null) {
     throw new Error('thread is null.')
@@ -254,12 +255,12 @@ async function checkRenamedThread(
     return
   }
   console.log(
-    `Renamed thread - Update row: ${dbThread.name} -> ${thread.name} (${thread.id})`
+    `Renamed thread - Update row: ${dbThread.name} -> ${thread.name} (${thread.id})`,
   )
   try {
     const result = (await conn.execute(
       'UPDATE threads SET name = ? WHERE thread_id = ? AND name != ?',
-      [thread.name, thread.id, thread.name]
+      [thread.name, thread.id, thread.name],
     )) as unknown as ResultSetHeader[]
     if (result[0].affectedRows === 0) {
       console.log('-> The thread name change has already been recorded.')
@@ -287,7 +288,7 @@ async function checkRenamedThread(
         changeLog ? changeLog.changedBy : null,
         'THREAD_NAME',
         changeLog ? changeLog.timestamp : null,
-      ]
+      ],
     )
     .catch(() => null)
   await conn.commit()
@@ -311,7 +312,7 @@ async function checkExistsUser(conn: mysql.Connection, user: User) {
   await conn
     .execute(
       'INSERT INTO users (user_id, username, discriminator, bot, `system`, created_at) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)',
-      [user.id, user.username, user.discriminator, user.bot, user.system]
+      [user.id, user.username, user.discriminator, user.bot, user.system],
     )
     .catch(() => null)
   await conn.commit()
@@ -334,13 +335,13 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
   let changed = false
   if (dbUser.username !== user.username) {
     console.log(
-      `Modified user:username - Update row: ${dbUser.username} -> ${user.username} (${user.id})`
+      `Modified user:username - Update row: ${dbUser.username} -> ${user.username} (${user.id})`,
     )
     changed = true
   }
   if (dbUser.discriminator !== user.discriminator) {
     console.log(
-      `Modified user:discriminator - Update row: ${dbUser.discriminator} -> ${user.discriminator} (${user.id})`
+      `Modified user:discriminator - Update row: ${dbUser.discriminator} -> ${user.discriminator} (${user.id})`,
     )
     changed = true
   }
@@ -357,7 +358,7 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
         user.id,
         user.username,
         user.discriminator,
-      ]
+      ],
     )) as unknown as ResultSetHeader[]
     if (result[0].affectedRows === 0) {
       console.log('-> The username / user tag changes are already recorded.')
@@ -371,7 +372,7 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
     await conn
       .execute(
         'INSERT INTO `name-changes` (id, old_name, new_name, changed_by, type, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-        [user.id, dbUser.username, user.username, null, 'USER_NAME', null]
+        [user.id, dbUser.username, user.username, null, 'USER_NAME', null],
       )
       .catch(() => null)
   }
@@ -386,7 +387,7 @@ async function checkModifiedUser(conn: mysql.Connection, user: User) {
           null,
           'USER_DISCRIMINATOR',
           null,
-        ]
+        ],
       )
       .catch(() => null)
   }
@@ -398,7 +399,7 @@ async function getNameChanged(
   log:
     | GuildAuditLogs<AuditLogEvent.GuildUpdate>
     | GuildAuditLogs<AuditLogEvent.ChannelUpdate>
-    | GuildAuditLogs<AuditLogEvent.ThreadUpdate>
+    | GuildAuditLogs<AuditLogEvent.ThreadUpdate>,
 ) {
   let changedBy = null
   let timestamp = null
