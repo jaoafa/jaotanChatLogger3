@@ -38,18 +38,24 @@ client.on('ready', async () => {
         return
       }
       console.log(
-        `Join new thread: ${channel.name} (${channel.id}) in ${guild.name} (${guild.id})`
+        `Join new thread: ${channel.name} (${channel.id}) in ${guild.name} (${guild.id})`,
       )
       channel.join()
     })
   })
 
-  setInterval(async () => {
-    await checkNewVersion()
-  }, 1000 * 60 * 60) // 1時間ごと
-  setInterval(async () => {
-    await addOldMessages()
-  }, 1000 * 60 * 60 * 24) // 1日ごと
+  setInterval(
+    async () => {
+      await checkNewVersion()
+    },
+    1000 * 60 * 60,
+  ) // 1時間ごと
+  setInterval(
+    async () => {
+      await addOldMessages()
+    },
+    1000 * 60 * 60 * 24,
+  ) // 1日ごと
   await addOldMessages()
 })
 
@@ -67,7 +73,7 @@ client.on(
   'messageUpdate',
   async (
     _old: Message | PartialMessage,
-    newMessage: Message | PartialMessage
+    newMessage: Message | PartialMessage,
   ) => {
     const conn = await getDBConnection()
     if (conn === null) {
@@ -75,10 +81,10 @@ client.on(
     }
     await editedMessage(
       conn,
-      newMessage.partial ? await newMessage.fetch() : newMessage
+      newMessage.partial ? await newMessage.fetch() : newMessage,
     )
     conn.destroy()
-  }
+  },
 )
 
 // raw(MESSAGE_DELETE): メッセージが削除されたとき -> DBにメッセージ削除データを追加
@@ -150,7 +156,7 @@ client.on(
       }
       thread.join().catch(() => null)
     })
-  }
+  },
 )
 
 client
