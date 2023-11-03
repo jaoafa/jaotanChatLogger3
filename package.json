@@ -35,7 +35,7 @@
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-n": "16.2.0",
     "eslint-plugin-promise": "6.1.1",
-    "mysql2": "3.6.2",
+    "mysql2": "3.6.3",
     "nodejs-file-downloader": "4.12.1",
     "prettier": "3.0.3",
     "ts-node": "10.9.1",
