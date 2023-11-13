@@ -37,7 +37,7 @@
     "eslint-plugin-promise": "6.1.1",
     "mysql2": "3.6.3",
     "nodejs-file-downloader": "4.12.1",
-    "prettier": "3.0.3",
+    "prettier": "3.1.0",
     "ts-node": "10.9.1",
     "ts-node-dev": "2.0.0",
     "typescript": "5.2.2",
